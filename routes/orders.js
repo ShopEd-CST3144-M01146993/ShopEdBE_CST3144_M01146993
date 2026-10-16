@@ -1,0 +1,39 @@
+const express = require('express');
+const router = express.Router();
+
+router.post('/', async (req, res) => {
+  try {
+    const { name, phone, lessonIDs, spaces } = req.body;
+
+    const nameRegex = /^[A-Za-z\s]+$/;
+    const phoneRegex = /^[0-9]+$/;
+
+    const isNameValid = typeof name === 'string' && nameRegex.test(name.trim());
+    const isPhoneValid = (typeof phone === 'string' || typeof phone === 'number') && phoneRegex.test(String(phone).trim());
+    const isLessonIDsValid = Array.isArray(lessonIDs) && lessonIDs.length > 0;
+    const isSpacesValid = Number.isInteger(spaces) && spaces >= 1;
+
+    if (!isNameValid || !isPhoneValid || !isLessonIDsValid || !isSpacesValid) {
+      return res.status(400).json({ error: 'Invalid order payload' });
+    }
+
+    const orderDocument = {
+      name: name.trim(),
+      phone: String(phone).trim(),
+      lessonIDs,
+      spaces,
+      createdAt: new Date()
+    };
+
+    const result = await req.db.collection('orders').insertOne(orderDocument);
+
+    res.status(201).json({
+      message: 'Order created',
+      orderId: result.insertedId
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+module.exports = router;
