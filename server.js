@@ -19,6 +19,10 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get('/', (req, res) => {
+  res.send('ShopEd API is running');
+});
+
 app.use('/lessons', lessonsRouter);
   
 async function startServer() {
