@@ -14,7 +14,7 @@ app.use(express.json());
 app.use((req, res, next) => {
   res.on('finish', () => {
     const timestamp = new Date().toISOString();
-    console.log(`[${timestamp}] ${req.method} request to: ${req.url} - Status: ${res.statusCode}`);
+    console.log(`[${timestamp}] ${req.method} request to: ${req.originalUrl} - Status: ${res.statusCode}`);
   });
   next();
 });
