@@ -1,31 +1,36 @@
 const express = require('express');
 const router = express.Router();
+const { getDB } = require('../db');
 
 router.post('/', async (req, res) => {
   try {
-    const { name, phone, lessonIDs, spaces } = req.body;
+    const db = getDB();
+    const { name, email, phone, lessonIDs, spaces } = req.body;
 
     const nameRegex = /^[A-Za-z\s]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^[0-9]+$/;
 
     const isNameValid = typeof name === 'string' && nameRegex.test(name.trim());
+    const isEmailValid = typeof email === 'string' && emailRegex.test(email.trim());
     const isPhoneValid = (typeof phone === 'string' || typeof phone === 'number') && phoneRegex.test(String(phone).trim());
     const isLessonIDsValid = Array.isArray(lessonIDs) && lessonIDs.length > 0;
     const isSpacesValid = Number.isInteger(spaces) && spaces >= 1;
 
-    if (!isNameValid || !isPhoneValid || !isLessonIDsValid || !isSpacesValid) {
+    if (!isNameValid || !isEmailValid || !isPhoneValid || !isLessonIDsValid || !isSpacesValid) {
       return res.status(400).json({ error: 'Invalid order payload' });
     }
 
     const orderDocument = {
       name: name.trim(),
+      email: email.trim(),
       phone: String(phone).trim(),
       lessonIDs,
       spaces,
       createdAt: new Date()
     };
 
-    const result = await req.db.collection('orders').insertOne(orderDocument);
+    const result = await db.collection('orders').insertOne(orderDocument);
 
     res.status(201).json({
       message: 'Order created',
