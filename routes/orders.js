@@ -27,7 +27,7 @@ router.post('/', async (req, res) => {
       phone: String(phone).trim(),
       lessonIDs,
       spaces,
-      createdAt: new Date()
+      createdAt: new Date().toISOString()
     };
 
     const result = await db.collection('orders').insertOne(orderDocument);
