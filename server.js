@@ -23,7 +23,7 @@ app.use((req, res, next) => {
 });
 
 app.get('/', (req, res) => {
-  res.send('ShopEd API is running');
+  res.json({message: 'ShopEd API is running'});
 });
 
 app.use('/images', (req, res) => {
