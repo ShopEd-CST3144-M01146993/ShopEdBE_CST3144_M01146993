@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
+const fs = require('fs');
 require('dotenv').config();
 
 const { connectDB } = require('./db');
@@ -22,6 +24,15 @@ app.use((req, res, next) => {
 
 app.get('/', (req, res) => {
   res.send('ShopEd API is running');
+});
+
+app.use('/images', (req, res) => {
+  const filePath = path.join(__dirname, 'images', req.url);
+  if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+    res.sendFile(filePath);
+  } else {
+    res.status(404).json({ error: 'Image file does not exist' });
+  }
 });
 
 app.use('/lessons', lessonsRouter);
