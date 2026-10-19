@@ -5,11 +5,11 @@ const { getDB } = require('../db');
 router.post('/', async (req, res) => {
   try {
     const db = getDB();
-    const { name, email, phone, lessonIDs, spaces } = req.body;
+    const { name, email, phone, lessonIDs, spaces } = req.body || {};
 
-    const nameRegex = /^[A-Za-z\s]+$/;
+    const nameRegex = /^[A-Za-z][A-Za-z\s'-]+$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phoneRegex = /^[0-9]+$/;
+    const phoneRegex = /^\+?[0-9]+$/;
 
     const isNameValid = typeof name === 'string' && nameRegex.test(name.trim());
     const isEmailValid = typeof email === 'string' && emailRegex.test(email.trim());

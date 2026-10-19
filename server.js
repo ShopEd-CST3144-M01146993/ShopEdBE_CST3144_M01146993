@@ -4,6 +4,7 @@ require('dotenv').config();
 
 const { connectDB } = require('./db');
 const lessonsRouter = require('./routes/lessons.js');
+const ordersRouter = require('./routes/orders.js')
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -24,6 +25,8 @@ app.get('/', (req, res) => {
 });
 
 app.use('/lessons', lessonsRouter);
+
+app.use('/orders', ordersRouter)
   
 async function startServer() {
   try {
