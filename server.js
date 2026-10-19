@@ -1,44 +1,28 @@
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
-const fs = require('fs');
 require('dotenv').config();
 
 const { connectDB } = require('./db');
+const logger = require('./middleware/logger.js');
+const staticImages = require('./middleware/staticImages.js');
 const lessonsRouter = require('./routes/lessons.js');
-const ordersRouter = require('./routes/orders.js')
+const ordersRouter = require('./routes/orders.js');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 
 app.use(cors());
 app.use(express.json());
-
-app.use((req, res, next) => {
-  res.on('finish', () => {
-    const timestamp = new Date().toISOString();
-    console.log(`[${timestamp}] ${req.method} request to: ${req.originalUrl} - Status: ${res.statusCode}`);
-  });
-  next();
-});
+app.use(logger);
 
 app.get('/', (req, res) => {
-  res.json({message: 'ShopEd API is running'});
+  res.json({ message: 'ShopEd API is running' });
 });
 
-app.use('/images', (req, res) => {
-  const filePath = path.join(__dirname, 'images', req.url);
-  if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-    res.sendFile(filePath);
-  } else {
-    res.status(404).json({ error: 'Image file does not exist' });
-  }
-});
-
+app.use('/images', staticImages);
 app.use('/lessons', lessonsRouter);
+app.use('/orders', ordersRouter);
 
-app.use('/orders', ordersRouter)
-  
 async function startServer() {
   try {
     await connectDB();
