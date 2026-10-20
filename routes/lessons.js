@@ -25,7 +25,14 @@ router.put('/:id', async (req, res) => {
       return res.status(400).json({ error: 'No update data provided' });
     }
 
-    const { spaces, price, subject, location } = req.body;
+    const allowedFields = ['spaces', 'price', 'subject', 'location', 'image', 'altText'];
+    const invalidFields = Object.keys(req.body).filter(key => !allowedFields.includes(key));
+
+    if (invalidFields.length > 0) {
+      return res.status(400).json({ error: `Invalid field(s): ${invalidFields.join(', ')}` });
+    }
+
+    const { spaces, price, subject, location, image, altText } = req.body;
 
     if (spaces !== undefined && (!Number.isInteger(spaces) || spaces < 0)) {
       return res.status(400).json({ error: 'Spaces must be a non-negative integer' });
@@ -43,11 +50,21 @@ router.put('/:id', async (req, res) => {
       return res.status(400).json({ error: 'Location must be at least 2 characters' });
     }
 
+    if (image !== undefined && (typeof image !== 'string' || image.trim().length < 3)) {
+      return res.status(400).json({ error: 'Image path must be at least 3 characters' });
+    }
+
+    if (altText !== undefined && (typeof altText !== 'string' || altText.trim().length < 2)) {
+      return res.status(400).json({ error: 'Alt text must be at least 2 characters' });
+    }
+
     const updateData = {};
     if (spaces !== undefined) updateData.spaces = spaces;
     if (price !== undefined) updateData.price = price;
     if (subject !== undefined) updateData.subject = subject.trim();
     if (location !== undefined) updateData.location = location.trim();
+    if (image !== undefined) updateData.image = image.trim();
+    if (altText !== undefined) updateData.altText = altText.trim();
 
     if (Object.keys(updateData).length === 0) {
       return res.status(400).json({ error: 'No valid updatable fields provided' });
