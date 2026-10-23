@@ -7,12 +7,12 @@ router.post('/', async (req, res) => {
     const db = getDB();
     const { name, email, phone, lessonIDs, spaces } = req.body || {};
 
-    const nameRegex = /^[A-Za-z][A-Za-z\s'-]+$/;
+    const nameRegex = /^[A-Za-z\s]+$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phoneRegex = /^\+?[0-9]+$/;
+    const phoneRegex = /^[0-9]+$/;
 
-    const isNameValid = typeof name === 'string' && nameRegex.test(name.trim());
-    const isEmailValid = typeof email === 'string' && emailRegex.test(email.trim());
+    const isNameValid = typeof name === 'string' && nameRegex.test(name.trim()) && name.trim().length > 0;
+    const isEmailValid = email === undefined || email === null || email === '' || (typeof email === 'string' && emailRegex.test(email.trim()));
     const isPhoneValid = (typeof phone === 'string' || typeof phone === 'number') && phoneRegex.test(String(phone).trim());
     const isLessonIDsValid = Array.isArray(lessonIDs) && lessonIDs.length > 0;
     const isSpacesValid = Number.isInteger(spaces) && spaces >= 1;
@@ -23,12 +23,15 @@ router.post('/', async (req, res) => {
 
     const orderDocument = {
       name: name.trim(),
-      email: email.trim(),
       phone: String(phone).trim(),
       lessonIDs,
       spaces,
       createdAt: new Date().toISOString()
     };
+
+    if (typeof email === 'string' && email.trim().length > 0) {
+      orderDocument.email = email.trim();
+    }
 
     const result = await db.collection('orders').insertOne(orderDocument);
 
