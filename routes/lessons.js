@@ -5,7 +5,22 @@ const { getDB } = require('../db');
 router.get('/', async (req, res) => {
   try {
     const db = getDB();
-    const lessons = await db.collection('lessons').find({}).toArray();
+    const search = (req.query.search || '').trim();
+
+    let query = {};
+    if (search.length > 0) {
+      const safeTerm = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      query = {
+        $or: [
+          { subject: { $regex: safeTerm, $options: 'i' } },
+          { location: { $regex: safeTerm, $options: 'i' } },
+          { $expr: { $regexMatch: { input: { $toString: "$price" }, regex: safeTerm, options: "i" } } },
+          { $expr: { $regexMatch: { input: { $toString: "$spaces" }, regex: safeTerm, options: "i" } } }
+        ]
+      };
+    }
+
+    const lessons = await db.collection('lessons').find(query).toArray();
     res.status(200).json(lessons);
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
