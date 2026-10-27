@@ -6,9 +6,11 @@ router.get('/:id', async (req, res) => {
   try {
     const db = getDB();
     const lessonId = parseInt(req.params.id, 10);
+    
     if (isNaN(lessonId)) {
       return res.status(400).json({ error: 'Invalid Lesson ID' });
     }
+    
     const lesson = await db.collection('lessons').findOne({id: lessonId});
 
     if (!lesson) {
@@ -26,10 +28,8 @@ router.get('/:id', async (req, res) => {
       lessonId: lessonId,
       enrolmentCount: enrolmentCount
     });
-    
   } catch (error) {
-    console.log('Enrolment error:', error)
-    return res.status(500).json({ error: 'Internal server error'})
+    return res.status(500).json({ error: 'Internal Server Error' })
   }
 });
 
