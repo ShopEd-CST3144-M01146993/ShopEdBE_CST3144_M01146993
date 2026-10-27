@@ -7,6 +7,7 @@ const logger = require('./middleware/logger.js');
 const staticImages = require('./middleware/staticImages.js');
 const lessonsRouter = require('./routes/lessons.js');
 const ordersRouter = require('./routes/orders.js');
+const enrolmentsRouter = require('./routes/enrolment.js')
 
 const app = express();
 const PORT = process.env.PORT;
@@ -22,6 +23,7 @@ app.get('/', (req, res) => {
 app.use('/images', staticImages);
 app.use('/lessons', lessonsRouter);
 app.use('/orders', ordersRouter);
+app.use('/enrolment', enrolmentsRouter);
 
 async function startServer() {
   try {
